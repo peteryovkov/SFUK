@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#c8102e" />
+  <title>БЧК СФУК – Асистент за поръчки (Приложение 7)</title>
+  <style>
+    :root {
+      --red: #c8102e;
+      --red-dark: #9b0c23;
+      --red-light: #fef2f2;
+      --amber: #d97706;
+      --amber-light: #fffbeb;
+      --blue: #1d4ed8;
+      --blue-light: #eff6ff;
+      --green: #15803d;
+      --green-light: #f0fdf4;
+      --slate: #334155;
+      --slate-light: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: var(--text);
+      line-height: 1.5;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: #ffffff;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--red);
+      color: #ffffff;
+      padding: 18px 20px;
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 0.82rem;
+      opacity: 0.92;
+      margin-top: 2px;
+    }
+
+    .tabs {
+      display: flex;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .tab-btn.active {
+      color: var(--red);
+      border-bottom-color: var(--red);
+      background: #ffffff;
+    }
+
+    .progress-bar {
+      height: 5px;
+      background: #e2e8f0;
+      width: 100%;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--red);
+      width: 20%;
+      transition: width 0.25s ease;
+    }
+
+    main {
+      padding: 20px;
+      flex: 1;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .step-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--red);
+      background: var(--red-light);
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .hint {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .option-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .option-card {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #fff;
+    }
+
+    .option-card:hover {
+      border-color: #cbd5e1;
+      background: var(--slate-light);
+    }
+
+    .option-card.selected {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .option-card input {
+      margin-top: 3px;
+      accent-color: var(--red);
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .option-title {
+      font-weight: 600;
+      font-size: 0.94rem;
+      display: block;
+    }
+
+    .option-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .field-group {
+      margin-bottom: 14px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--slate);
+    }
+
+    input[type="number"], input[type="text"], textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--red-dark);
+    }
+
+    .btn-primary:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--slate);
+      flex: 0.45;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 600;
+    }
+
+    .btn-outline:hover {
+      background: var(--red-light);
+    }
+
+    .result-box {
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 6px solid;
+    }
+
+    .res-direct { background: var(--green-light); border-color: var(--green); }
+    .res-direct .tier-label { color: var(--green); }
+
+    .res-market { background: var(--blue-light); border-color: var(--blue); }
+    .res-market .tier-label { color: var(--blue); }
+
+    .res-comp { background: var(--amber-light); border-color: var(--amber); }
+    .res-comp .tier-label { color: #b45309; }
+
+    .res-public { background: var(--red-light); border-color: var(--red); }
+    .res-public .tier-label { color: var(--red); }
+
+    .res-exempt { background: var(--slate-light); border-color: var(--slate); }
+    .res-exempt .tier-label { color: var(--slate); }
+
+    .tier-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tier-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 4px 0 6px 0;
+    }
+
+    .info-panel {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .info-panel h3 {
+      font-size: 0.94rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .checklist {
+      padding-left: 18px;
+      font-size: 0.88rem;
+    }
+
+    .checklist li {
+      margin-bottom: 6px;
+    }
+
+    .template-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.86rem;
+    }
+
+    .template-item:last-child {
+      border-bottom: none;
+    }
+
+    .warning-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      margin-bottom: 14px;
+    }
+
+    .memo-output {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+      margin-top: 10px;
+      color: #1e293b;
+    }
+
+    table.calc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      margin-bottom: 12px;
+    }
+
+    table.calc-table th, table.calc-table td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      text-align: left;
+    }
+
+    table.calc-table th {
+      background: #f8fafc;
+    }
+
+    footer {
+      text-align: center;
+      padding: 12px 20px 16px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>БЧК СФУК – Асистент за процедури по поръчки</h1>
+    <p>Приложение 7 (в сила от 01.01.2026 г.) • Определяне на ред, документи и оценка</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabTriage" onclick="switchTab('triage')">1. Избор на процедура</button>
+    <button class="tab-btn" id="tabCalc" onclick="switchTab('calc')">2. Калкулатор КО (Оценка)</button>
+  </div>
+
+  <!-- VIEW 1: TRIAGE -->
+  <div class="view active" id="viewTriage">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <main>
+      <!-- STEP 0: Exceptions Art. 31 -->
+      <section class="step active" id="step0">
+        <span class="step-badge">Стъпка 1 от 4 • Проверка за изключения (Чл. 31)</span>
+        <h2>Попада ли поръчката в изключенията по Чл. 31?</h2>
+        <p class="hint">Вътрешните правила НЕ се прилагат при следните специфични случаи:</p>
+
+        <div class="option-group" id="exemptGroup">
+          <label class="option-card">
+            <input type="radio" name="exempt" value="none" checked />
+            <div>
+              <span class="option-title">Не — стандартна поръчка (правилата се прилагат)</span>
+              <span class="option-desc">Продължете към избор на структура, обект и стойност.</span>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="exempt" value="disaster" />
+            <div>
+              <span class="option-title">Бедствия, аварии и кризи (Чл. 31, ал. 1)</span>
+              <span class="option-desc">Неотложно подпомагане или пряка заплаха за сграден фонд – изисква решение на Дирекционния съвет към Председателя на БЧК за всеки отделен случай.</span>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="exempt" value="zbut" />
+            <div>
+              <span class="option-title">Служба по трудова медицина / ЗБУТ (Чл. 31, ал. 4 и Чл. 32)</span>
+              <span class="option-desc">Осъществява се по решение на Комитета по условия на труд.</span>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="exempt" value="donor" />
+            <div>
+              <span class="option-title">Воля на дарител или нарочен обществен орган (Чл. 31, ал. 5–6)</span>
+              <span class="option-desc">Дарителят изрично е определил доставчика или има създаден обществен орган с мандат.</span>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="exempt" value="other_exempt" />
+            <div>
+              <span class="option-title">Друго изключение по Чл. 31 (ал. 2, 3, 7, 9, 10)</span>
+              <span class="option-desc">Действащ рамков/абонаментен договор; горива/самолетни билети; фиксирани от регулатор цени; придобиване/наем на имот; задължителен нормативен акт (над праговете му).</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="handleStep0()">Продължи →</button>
+        </div>
+      </section>
+
+      <!-- STEP 1: Structure & Funding -->
+      <section class="step" id="step1">
+        <span class="step-badge">Стъпка 2 от 4 • Структура и финансиране</span>
+        <h2>Коя структура възлага поръчката и какъв е източникът?</h2>
+
+        <div class="field-group">
+          <label>1. Структурно звено на БЧК:</label>
+          <div class="option-group" id="structGroup">
+            <label class="option-card selected">
+              <input type="radio" name="structure" value="ns" checked />
+              <div>
+                <span class="option-title">Секретариат на Националния съвет (НС) на БЧК</span>
+                <span class="option-desc">Съгласуване от директор дирекция „ФАСД“ и финансов контрольор; утвърждава Генералният директор.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="structure" value="os" />
+              <div>
+                <span class="option-title">ОС / СС на БЧК, учебен център или база</span>
+                <span class="option-desc">Утвърждава Директорът на съответния секретариат / център / база.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>2. Източник на средствата (Чл. 9, ал. 2 и Чл. 12):</label>
+          <div class="option-group" id="fundGroup">
+            <label class="option-card selected">
+              <input type="radio" name="funding" value="standard" checked />
+              <div>
+                <span class="option-title">Собствени средства / дарения / международни проекти</span>
+                <span class="option-desc">Прилагат се стандартните стойностни прагове по чл. 8 – чл. 11.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="funding" value="public_cap" />
+              <div>
+                <span class="option-title">Публични средства / субсидия за капиталови разходи</span>
+                <span class="option-desc">Важно (Чл. 9, ал. 2): За строителство (чл. 3.1) и доставки (чл. 3.3) се прилага МИНИМУМ Състезателна процедура!</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="goStep(0)">← Назад</button>
+          <button class="btn-primary" onclick="goStep(2)">Продължи →</button>
+        </div>
+      </section>
+
+      <!-- STEP 2: Object & Value -->
+      <section class="step" id="step2">
+        <span class="step-badge">Стъпка 3 от 4 • Обект и прогнозна стойност</span>
+        <h2>Определете вида и стойността на поръчката</h2>
+
+        <div class="field-group">
+          <label>1. Обект на поръчката (Чл. 3):</label>
+          <div class="option-group" id="objGroup">
+            <label class="option-card selected">
+              <input type="radio" name="objType" value="works" checked />
+              <div>
+                <span class="option-title">Строителство и СМР (Чл. 3, т. 1)</span>
+                <span class="option-desc">Строителство, отделни строително-монтажни и ремонтни работи.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="objType" value="services" />
+              <div>
+                <span class="option-title">Предоставяне на услуги (Чл. 3, т. 2)</span>
+                <span class="option-desc">Консултантски, логистични, обучителни, ИТ и други услуги.</span>
+              </div>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="objType" value="goods" />
+              <div>
+                <span class="option-title">Доставки на стоки (Чл. 3, т. 3 и Чл. 4)</span>
+                <span class="option-desc">Покупка на стоки, машини и съоръжения (вкл. транспорт, монтаж и обучение).</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="estValue">2. Прогнозна стойност в ЕВРО без ДДС (Чл. 7 – забрана за разделяне):</label>
+          <input type="number" id="estValue" min="0" step="0.01" placeholder="Например: 8500" oninput="validateValue()" />
+        </div>
+
+        <div class="warning-box">
+          <strong>Чл. 7 (1):</strong> Не се допуска разделяне на предмета на поръчката с цел заобикаляне на процедура за по-висока стойност.
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="goStep(1)">← Назад</button>
+          <button class="btn-primary" id="btnCalcProc" disabled onclick="evaluateProcedure()">Определи процедурата →</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: Result & Memo Generator -->
+      <section class="step" id="step3">
+        <span class="step-badge">Резултат от преценката</span>
+        <div id="resultContainer"></div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="resetTriage()">Нова проверка</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- VIEW 2: KO CALCULATOR -->
+  <div class="view" id="viewCalc">
+    <main>
+      <span class="step-badge">Примерна методика • Комплексна оценка (КО)</span>
+      <h2>Калкулатор по критерий „Икономически най-изгодна оферта“</h2>
+      <p class="hint">Изчислява точките по формулите от Приложение 7: КО = П₁ + П₂ + П₃ (при препоръчителни тегла 40% / 40% / 20%).</p>
+
+      <div style="display:flex; gap:10px; margin-bottom:14px;">
+        <div style="flex:1;">
+          <label style="font-size:0.8rem; font-weight:600;">Тегло Техн. (П₁) %</label>
+          <input type="number" id="wTech" value="40" min="0" max="100" />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.8rem; font-weight:600;">Тегло Цена (П₂) %</label>
+          <input type="number" id="wPrice" value="40" min="1" max="100" />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.8rem; font-weight:600;">Тегло Срок (П₃) %</label>
+          <input type="number" id="wTime" value="20" min="0" max="100" />
+        </div>
+      </div>
+
+      <table class="calc-table">
+        <thead>
+          <tr>
+            <th>Кандидат</th>
+            <th>Техн. точки (Тт, макс 100)</th>
+            <th>Цена (€ без ДДС)</th>
+            <th>Срок (дни)</th>
+            <th>КО Резултат</th>
+          </tr>
+        </thead>
+        <tbody id="calcRows">
+          <tr>
+            <td><input type="text" value="Кандидат 1" /></td>
+            <td><input type="number" class="in-tech" value="90" min="0" max="100" /></td>
+            <td><input type="number" class="in-price" value="12000" min="1" /></td>
+            <td><input type="number" class="in-time" value="15" min="1" /></td>
+            <td class="out-ko" style="font-weight:700;">—</td>
+          </tr>
+          <tr>
+            <td><input type="text" value="Кандидат 2" /></td>
+            <td><input type="number" class="in-tech" value="80" min="0" max="100" /></td>
+            <td><input type="number" class="in-price" value="10500" min="1" /></td>
+            <td><input type="number" class="in-time" value="20" min="1" /></td>
+            <td class="out-ko" style="font-weight:700;">—</td>
+          </tr>
+          <tr>
+            <td><input type="text" value="Кандидат 3" /></td>
+            <td><input type="number" class="in-tech" value="95" min="0" max="100" /></td>
+            <td><input type="number" class="in-price" value="13000" min="1" /></td>
+            <td><input type="number" class="in-time" value="10" min="1" /></td>
+            <td class="out-ko" style="font-weight:700;">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="addCalcRow()">+ Добави кандидат</button>
+        <button class="btn-primary" onclick="calculateKO()">Изчисли класиране</button>
+      </div>
+
+      <div id="koSummary" style="margin-top:14px;"></div>
+    </main>
+  </div>
+
+  <footer>
+    Български Червен кръст • Вътрешни правила по СФУК (Приложение 7, Решение № 51 / 21.11.2025 г.)
+  </footer>
+</div>
+
+<script>
+  const state = {
+    exempt: 'none',
+    structure: 'ns',
+    funding: 'standard',
+    objType: 'works',
+    value: 0
+  };
+
+  function bindRadioCards() {
+    document.querySelectorAll('.option-card input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const group = radio.closest('.option-group');
+        group.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        radio.closest('.option-card').classList.add('selected');
+        state[radio.name] = radio.value;
+      });
+    });
+  }
+  bindRadioCards();
+
+  function switchTab(tab) {
+    document.getElementById('tabTriage').classList.toggle('active', tab === 'triage');
+    document.getElementById('tabCalc').classList.toggle('active', tab === 'calc');
+    document.getElementById('viewTriage').classList.toggle('active', tab === 'triage');
+    document.getElementById('viewCalc').classList.toggle('active', tab === 'calc');
+  }
+
+  function goStep(num) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + num).classList.add('active');
+    const prog = { 0: '20%', 1: '45%', 2: '75%', 3: '100%' };
+    document.getElementById('progressFill').style.width = prog[num];
+    window.scrollTo(0, 0);
+  }
+
+  function handleStep0() {
+    if (state.exempt !== 'none') {
+      renderExemptResult(state.exempt);
+    } else {
+      goStep(1);
+    }
+  }
+
+  function validateValue() {
+    const val = parseFloat(document.getElementById('estValue').value);
+    const valid = !isNaN(val) && val >= 0;
+    state.value = valid ? val : 0;
+    document.getElementById('btnCalcProc').disabled = !valid;
+  }
+
+  function renderExemptResult(type) {
+    const titles = {
+      disaster: 'Изключение по Чл. 31, ал. 1 – Бедствия, аварии и кризи',
+      zbut: 'Изключение по Чл. 31, ал. 4 и Чл. 32 – Служба по трудова медицина / ЗБУТ',
+      donor: 'Изключение по Чл. 31, ал. 5–6 – Воля на дарител / обществен орган',
+      other_exempt: 'Изключение по Чл. 31 (ал. 2, 3, 7, 9, 10)'
+    };
+    const notes = {
+      disaster: 'Изисква се изрично решение на Дирекционния съвет към Председателя на БЧК за всеки отделен случай, когато факторът „време“ е от съществено значение за живота/здравето на бедстващи или при пряка заплаха за сграден фонд.',
+      zbut: 'Изборът на Служба по трудова медицина и услуги по ЗБУТ се осъществява по решение на Комитета по условия на труд.',
+      donor: 'Прилага се, когато дарителят изрично е определил доставчика в договора/волята си, или когато е създаден нарочен обществен орган с мандат за избор на изпълнител.',
+      other_exempt: 'Уверете се, че е налице действащ рамков/абонаментен договор, нормативно фиксирана цена, ежедневна доставка с динамична цена (горива, самолетни билети) или сделка с недвижим имот.'
+    };
+
+    document.getElementById('resultContainer').innerHTML = `
+      <div class="result-box res-exempt">
+        <div class="tier-label">Вътрешните правила НЕ се прилагат</div>
+        <div class="tier-title">${titles[type]}</div>
+        <p style="font-size:0.88rem;">${notes[type]}</p>
+      </div>
+      <div class="info-panel">
+        <h3>Документиране и архив (Чл. 30)</h3>
+        <ul class="checklist">
+          <li>Приложете към досието документа, доказващ основанието по чл. 31 (напр. решение на Дирекционния съвет, решение на КУТ, договор за дарение или рамков договор).</li>
+          <li>Съхранявайте документацията в ресорната дирекция на НС или съответния секретариат на ОС/СС/база.</li>
+        </ul>
+      </div>
+    `;
+    goStep(3);
+  }
+
+  function evaluateProcedure() {
+    const v = state.value;
+    const isWorks = state.objType === 'works';
+    const isPublicCap = state.funding === 'public_cap';
+
+    // Thresholds:
+    // Works: < 7500 Direct | 7500 to < 25000 Market | 25000 to 50000 Competitive | > 50000 Public Invitation
+    // Services/Goods: < 1000 Direct | 1000 to < 10000 Market | 10000 to 30000 Competitive | > 30000 Public Invitation
+    let proc = 'direct';
+
+    if (isWorks) {
+      if (v > 50000) proc = 'public';
+      else if (v >= 25000) proc = 'comp';
+      else if (v >= 7500) proc = 'market';
+      else proc = 'direct';
+    } else {
+      if (v > 30000) proc = 'public';
+      else if (v >= 10000) proc = 'comp';
+      else if (v >= 1000) proc = 'market';
+      else proc = 'direct';
+    }
+
+    // Art. 9(2) override: Public funds / capital subsidy for works (3.1) or goods (3.3) -> minimum Competitive procedure
+    let capOverrideNote = '';
+    if (isPublicCap && (state.objType === 'works' || state.objType === 'goods') && (proc === 'direct' || proc === 'market')) {
+      proc = 'comp';
+      capOverrideNote = '<div class="warning-box"><strong>Приложено правило по Чл. 9, ал. 2:</strong> Поради финансиране от публични средства / субсидия за капиталови разходи (за строителство или доставки), поръчката задължително се провежда най-малко чрез <strong>Състезателна процедура</strong>.</div>';
+    }
+
+    const nsApproval = state.structure === 'ns'
+      ? '<li><strong>Задължително съгласуване (НС на БЧК):</strong> Преди утвърждаване от Генералния директор, документите се съгласуват от <strong>директор дирекция „ФАСД“</strong> и <strong>финансовия контрольор</strong>.</li>'
+      : '<li><strong>Утвърждаване (ОС/СС/База/УЦ):</strong> Утвърждава се от Директора на съответния секретариат, учебен център или база. При капиталов трансфер (Чл. 12) изпратете писмо с всички документи до Генералния директор за превод на средствата.</li>';
+
+    let html = capOverrideNote;
+
+    if (proc === 'direct') {
+      html += `
+        <div class="result-box res-direct">
+          <div class="tier-label">Чл. 11 • Опростена процедура</div>
+          <div class="tier-title">Директно възлагане</div>
+          <p style="font-size:0.88rem;">Стойност: <strong>${v.toLocaleString('bg-BG')} € без ДДС</strong> (под прага от ${isWorks ? '7 500 €' : '1 000 €'}).</p>
+        </div>
+        <div class="info-panel">
+          <h3>Необходими действия и правила</h3>
+          <ul class="checklist">
+            <li>Поръчката се възлага директно на избран доставчик/изпълнител при спазване на принципите за икономичност и целесъобразност (Чл. 2).</li>
+            <li>Оформя се първичен счетоводен документ (фактура) и/или договор при необходимост.</li>
+            <li>Няма изискване за предварително събиране на писмени оферти по Приложение 7.</li>
+          </ul>
+        </div>
+      `;
+    } else if (proc === 'market') {
+      html += `
+        <div class="result-box res-market">
+          <div class="tier-label">Чл. 10 • Облекчена процедура</div>
+          <div class="tier-title">Пазарно проучване (с 1 оферта / извлечение)</div>
+          <p style="font-size:0.88rem;">Стойност: <strong>${v.toLocaleString('bg-BG')} € без ДДС</strong> (диапазон ${isWorks ? '7 500 € – под 25 000 €' : '1 000 € – под 10 000 €'}).</p>
+        </div>
+        <div class="info-panel">
+          <h3>Задължителни стъпки и документи (Чл. 10)</h3>
+          <ul class="checklist">
+            <li><strong>Докладна записка</strong> от ръководителя на структурното звено с обосновка на необходимостта, източника на средства и стойността.</li>
+            <li><strong>1 оферта или извлечение от интернет</strong>, в което ясно е посочен видът и цената на стоката/услугата/СМР.</li>
+            ${nsApproval}
+          </ul>
+        </div>
+        ${renderMemoGenerator('Чл. 10 (Пазарно проучване)')}
+      `;
+    } else if (proc === 'comp') {
+      html += `
+        <div class="result-box res-comp">
+          <div class="tier-label">Чл. 9 • Опростена процедура</div>
+          <div class="tier-title">Състезателна процедура (най-малко 3 оферти)</div>
+          <p style="font-size:0.88rem;">Стойност: <strong>${v.toLocaleString('bg-BG')} € без ДДС</strong> (диапазон ${isWorks ? '25 000 € – 50 000 €' : '10 000 € – 30 000 €'}).</p>
+        </div>
+        <div class="info-panel">
+          <h3>Задължителни стъпки и документи (Чл. 9)</h3>
+          <ul class="checklist">
+            <li><strong>Докладна записка</strong> с обосновка на необходимостта, източника на средства и срока за събиране на оферти.</li>
+            <li><strong>Най-малко 3 оферти и/или извлечения от интернет</strong> с ясно посочен вид и цена.</li>
+            <li><strong>Сравнителен анализ с обосновка</strong> на избраната оферта, представен едновременно с докладната записка.</li>
+            ${nsApproval}
+          </ul>
+        </div>
+        <div class="info-panel">
+          <h3>Препоръчителни шаблони от Приложение 7</h3>
+          <div class="template-item">
+            <span>2. Примерен образец на оферта</span>
+            <a class="btn-outline" href="templates/02_Obrazec_oferta.docx" download>Изтегли</a>
+          </div>
+          <div class="template-item">
+            <span>5. Примерна методика за оценка (при критерий ИНИО)</span>
+            <a class="btn-outline" href="templates/05_Metodika_ocenka.docx" download>Изтегли</a>
+          </div>
+          <div class="template-item">
+            <span>9. Таблици за сравнение и оценка (Приложения 1, 1а, 1б)</span>
+            <a class="btn-outline" href="templates/09_Tablici_ocenka_Pril1_1a_1b.xlsx" download>Изтегли</a>
+          </div>
+        </div>
+        ${renderMemoGenerator('Чл. 9 (Състезателна процедура)')}
+      `;
+    } else {
+      html += `
+        <div class="result-box res-public">
+          <div class="tier-label">Чл. 6, т. 1 и Чл. 8 • Пълна процедура</div>
+          <div class="tier-title">Публикуване на покана до неограничен кръг кандидати</div>
+          <p style="font-size:0.88rem;">Стойност: <strong>${v.toLocaleString('bg-BG')} € без ДДС</strong> (над прага от ${isWorks ? '50 000 €' : '30 000 €'}).</p>
+        </div>
+        <div class="info-panel">
+          <h3>Ключови срокове и правила (Чл. 14 – Чл. 29)</h3>
+          <ul class="checklist">
+            <li><strong>Откриване (Чл. 14):</strong> Докладна записка с показатели и тегла → Заповед за откриване + Задание (покана).</li>
+            <li><strong>Публичност и срокове (Чл. 15):</strong> Публикува се на сайта на БЧК (и ОС/СС) за <strong>минимум 7 дни</strong>. Разяснения се искат до 4 дни преди крайния срок и се публикуват в 3-дневен срок (Чл. 20).</li>
+            <li><strong>Оферти и Комисия (Чл. 21–22):</strong> Изискват се минимум 3 оферти в запечатан непрозрачен плик. След крайния срок се назначава Комисия (нечетен брой, вкл. икономист + резервен член).</li>
+            <li><strong>Протокол и уведомяване (Чл. 24):</strong> При НС на БЧК финансовият контрольор дава писмено становище върху протокола. В <strong>3-дневен срок</strong> след утвърждаване кандидатите се уведомяват писмено.</li>
+            ${nsApproval}
+          </ul>
+        </div>
+        <div class="info-panel">
+          <h3>Пълен пакет шаблони към Приложение 7 (9 документа)</h3>
+          <div class="template-item"><span>1. Заповед за откриване на процедура (чл. 14, т. 4)</span><a class="btn-outline" href="templates/01_Zapoved_otkrivane_chl14.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>2. Примерен образец на оферта</span><a class="btn-outline" href="templates/02_Obrazec_oferta.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>3. Декларация 1 на кандидата (чл. 28, ал. 1)</span><a class="btn-outline" href="templates/03_Deklaracia_1_kandidat.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>4. Декларация 2 на кандидата (опит, чл. 18, ал. 4)</span><a class="btn-outline" href="templates/04_Deklaracia_2_opit.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>5. Примерна методика за оценка на офертите</span><a class="btn-outline" href="templates/05_Metodika_ocenka.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>6. Заповед за назначаване на комисия (чл. 22, т. 1)</span><a class="btn-outline" href="templates/06_Zapoved_komisia_chl22.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>7. Декларация за безпристрастност (чл. 22, ал. 6)</span><a class="btn-outline" href="templates/07_Deklaracia_bezpristrastnost.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>8. Протокол за класиране на кандидатите (чл. 24)</span><a class="btn-outline" href="templates/08_Protokol_klasirane_chl24.docx" download>Изтегли</a></div>
+          <div class="template-item"><span>9. Таблици-опис и оценка (Приложения 1, 1а, 1б)</span><a class="btn-outline" href="templates/09_Tablici_ocenka_Pril1_1a_1b.xlsx" download>Изтегли</a></div>
+        </div>
+        ${renderMemoGenerator('Чл. 8 и Чл. 14 (Публична покана)')}
+      `;
+    }
+
+    document.getElementById('resultContainer').innerHTML = html;
+    goStep(3);
+  }
+
+  function renderMemoGenerator(procLabel) {
+    return `
+      <div class="info-panel" style="background:#fff; border-color:#cbd5e1;">
+        <h3>Бърз генератор на проект за Докладна записка (${procLabel})</h3>
+        <div class="field-group">
+          <label>Предмет на поръчката:</label>
+          <input type="text" id="memoSubject" placeholder="напр. Доставка на компютърна техника за нуждите на..." />
+        </div>
+        <div class="field-group">
+          <label>Обосновка на необходимостта:</label>
+          <textarea id="memoReason" placeholder="Опишете накратко защо е необходима поръчката..."></textarea>
+        </div>
+        <div class="field-group">
+          <label>Източник на финансиране (бюджетно перо / проект):</label>
+          <input type="text" id="memoSource" placeholder="напр. Проект BG..., перо 4.2" />
+        </div>
+        <button class="btn-outline" type="button" onclick="buildMemoText('${procLabel}')">Генерирай и копирай текст</button>
+        <div id="memoBox" class="memo-output" style="display:none;"></div>
+      </div>
+    `;
+  }
+
+  function buildMemoText(procLabel) {
+    const recipient = state.structure === 'ns'
+      ? 'ДО ГЕНЕРАЛНИЯ ДИРЕКТОР НА БЪЛГАРСКИ ЧЕРВЕН КРЪСТ'
+      : 'ДО ДИРЕКТОРА НА СЕКРЕТАРИАТА НА ОС/СС (УЦ/БАЗА) НА БЧК';
+    const subject = document.getElementById('memoSubject').value || '[Посочете предмет на поръчката]';
+    const reason = document.getElementById('memoReason').value || '[Посочете обосновка на необходимостта]';
+    const source = document.getElementById('memoSource').value || '[Посочете източник на средствата]';
+    const valStr = state.value.toLocaleString('bg-BG');
+
+    const approvalBlock = state.structure === 'ns'
+      ? `
+СЪГЛАСУВАЛИ:
+Директор дирекция „ФАСД“: __________________
+Финансов контрольор: __________________`
+      : '';
+
+    const text = `${recipient}
+
+ДОКЛАДНА ЗАПИСКА
+От: [Име, фамилия и длъжност на ръководителя на структурното звено]
+
+Относно: Провеждане на процедура по реда на ${procLabel} от Приложение 7 към СФУК на БЧК с предмет: „${subject}“
+
+УВАЖАЕМИ/А ГОСПОДИН/ГОСПОЖО ДИРЕКТОР,
+
+Във връзка с ${reason}, възникна необходимост от възлагане на поръчка с предмет: „${subject}“.
+
+1. Прогнозна стойност на поръчката: ${valStr} евро без ДДС.
+2. Източник на финансиране: ${source}.
+3. Приложим ред съгласно Приложение 7 към СФУК на БЧК: ${procLabel}.
+4. Приложения: [Опишете приложените оферти / извлечения от интернет / сравнителен анализ / проект на задание].
+
+Предвид гореизложеното, моля за Вашето разрешение и утвърждаване за провеждане на процедурата и разходване на средствата.
+
+Дата: ____________ г.                      С уважение: __________________
+                                           (Ръководител структурно звено)${approvalBlock}`;
+
+    const box = document.getElementById('memoBox');
+    box.style.display = 'block';
+    box.textContent = text;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+  }
+
+  function resetTriage() {
+    state.exempt = 'none';
+    state.structure = 'ns';
+    state.funding = 'standard';
+    state.objType = 'works';
+    state.value = 0;
+
+    document.getElementById('estValue').value = '';
+    document.getElementById('btnCalcProc').disabled = true;
+
+    ['exempt', 'structure', 'funding', 'objType'].forEach(name => {
+      const radios = document.querySelectorAll(`input[name="${name}"]`);
+      radios.forEach((r, idx) => {
+        r.checked = idx === 0;
+        r.closest('.option-card').classList.toggle('selected', idx === 0);
+      });
+    });
+
+    goStep(0);
+  }
+
+  function addCalcRow() {
+    const tbody = document.getElementById('calcRows');
+    const count = tbody.children.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="Кандидат ${count}" /></td>
+      <td><input type="number" class="in-tech" value="80" min="0" max="100" /></td>
+      <td><input type="number" class="in-price" value="12000" min="1" /></td>
+      <td><input type="number" class="in-time" value="15" min="1" /></td>
+      <td class="out-ko" style="font-weight:700;">—</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function calculateKO() {
+    const wTech = (parseFloat(document.getElementById('wTech').value) || 0) / 100;
+    const wPrice = (parseFloat(document.getElementById('wPrice').value) || 0) / 100;
+    const wTime = (parseFloat(document.getElementById('wTime').value) || 0) / 100;
+
+    const rows = Array.from(document.querySelectorAll('#calcRows tr'));
+    const data = rows.map(r => ({
+      row: r,
+      name: r.querySelector('input[type="text"]').value || 'Кандидат',
+      tech: parseFloat(r.querySelector('.in-tech').value) || 0,
+      price: parseFloat(r.querySelector('.in-price').value) || Infinity,
+      time: parseFloat(r.querySelector('.in-time').value) || Infinity
+    }));
+
+    const minPrice = Math.min(...data.map(d => d.price));
+    const minTime = Math.min(...data.map(d => d.time));
+
+    data.forEach(d => {
+      const p1 = d.tech * wTech;
+      const tc = d.price > 0 && d.price < Infinity ? (minPrice / d.price) * 100 : 0;
+      const p2 = tc * wPrice;
+      const ts = d.time > 0 && d.time < Infinity ? (minTime / d.time) * 100 : 0;
+      const p3 = ts * wTime;
+      d.ko = p1 + p2 + p3;
+      d.row.querySelector('.out-ko').textContent = `${d.ko.toFixed(2)} т.`;
+    });
+
+    const sorted = [...data].sort((a, b) => {
+      if (Math.abs(b.ko - a.ko) > 0.001) return b.ko - a.ko;
+      if (a.price !== b.price) return a.price - b.price;
+      if (b.tech !== a.tech) return b.tech - a.tech;
+      return a.time - b.time;
+    });
+
+    const rankingHtml = sorted.map((d, i) => `<li><strong>${i + 1} място:</strong> ${d.name} — <strong>${d.ko.toFixed(2)} точки</strong> (Цена: ${d.price.toLocaleString('bg-BG')} €, Техн.: ${d.tech} т., Срок: ${d.time} дни)</li>`).join('');
+
+    document.getElementById('koSummary').innerHTML = `
+      <div class="info-panel">
+        <h3>Класиране по методиката (Приложение 1):</h3>
+        <ul class="checklist">${rankingHtml}</ul>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>
